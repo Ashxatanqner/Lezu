@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ուղղագրական խաղ</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Armenian:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f1ea;--card:#fff;--ink:#1d2433;--mute:#6b7280;--line:#e4dfd3;--acc:#c2410c;--acc2:#fff3ea;--ok:#15803d;--okbg:#e8f6ec;--bad:#b91c1c;--badbg:#fdeceb;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14161c;--card:#1d2029;--ink:#eceef3;--mute:#9aa1b0;--line:#2c303c;--acc:#fb923c;--acc2:#2a2019;--ok:#4ade80;--okbg:#14291c;--bad:#f87171;--badbg:#2e1818}}
+:root[data-theme="dark"]{--bg:#14161c;--card:#1d2029;--ink:#eceef3;--mute:#9aa1b0;--line:#2c303c;--acc:#fb923c;--acc2:#2a2019;--ok:#4ade80;--okbg:#14291c;--bad:#f87171;--badbg:#2e1818}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font-family:"Noto Sans Armenian","Segoe UI",Arial,sans-serif;display:flex;align-items:center;justify-content:center;padding:24px}
+.wrap{width:100%;max-width:640px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:36px;box-shadow:0 10px 40px rgba(0,0,0,.06)}
+h1{font-size:30px;margin:0 0 8px;font-weight:800;letter-spacing:-.5px}
+p.sub{color:var(--mute);margin:0 0 26px;line-height:1.6}
+.themes{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.theme{border:2px solid var(--line);background:var(--bg);color:var(--ink);border-radius:18px;padding:22px 16px;cursor:pointer;font:inherit;text-align:center;transition:.15s}
+.theme:hover{border-color:var(--acc);transform:translateY(-2px)}
+.theme b{display:block;font-size:28px;color:var(--acc);margin-bottom:6px}
+.theme span{color:var(--mute);font-size:14px}
+.hide{display:none}
+.top{display:flex;justify-content:space-between;color:var(--mute);font-size:14px;margin-bottom:10px}
+.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin-bottom:30px}
+.bar i{display:block;height:100%;width:0;background:var(--acc);transition:width .3s}
+.q{font-size:18px;color:var(--mute);margin:0 0 6px}
+.clue{display:inline-block;background:var(--acc2);color:var(--acc);border-radius:99px;padding:3px 14px;font-size:15px;margin-bottom:6px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:22px 0}
+.opt{border:2px solid var(--line);background:var(--bg);color:var(--ink);border-radius:16px;padding:26px 10px;font:inherit;font-size:24px;font-weight:600;cursor:pointer;transition:.15s;position:relative}
+.opt:hover:not(:disabled){border-color:var(--acc);transform:translateY(-2px)}
+.opt:disabled{cursor:default}
+.opt small{position:absolute;top:8px;left:12px;font-size:12px;color:var(--mute);font-weight:400}
+.opt.ok{border-color:var(--ok);background:var(--okbg);color:var(--ok)}
+.opt.bad{border-color:var(--bad);background:var(--badbg);color:var(--bad)}
+.fb{border-radius:14px;padding:14px 18px;line-height:1.6;margin-bottom:18px;min-height:0}
+.fb.ok{background:var(--okbg);color:var(--ok)}
+.fb.bad{background:var(--badbg);color:var(--bad)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.btn{border:0;background:var(--acc);color:#fff;font:inherit;font-weight:600;padding:13px 26px;border-radius:12px;cursor:pointer}
+.btn:hover{opacity:.9}
+.ghost{background:none;color:var(--mute);border:0;font:inherit;cursor:pointer;padding:10px}
+.ghost:hover{color:var(--ink)}
+.score{font-size:64px;font-weight:800;color:var(--acc);margin:10px 0 0}
+.res{text-align:center}
+.res h2{margin:0 0 4px;font-size:24px}
+.missed{text-align:left;margin:22px 0;padding:14px 18px;background:var(--bg);border-radius:14px;font-size:15px;color:var(--mute);line-height:1.8;max-height:160px;overflow:auto}
+.missed b{color:var(--ink)}
+@media (max-width:480px){.card{padding:22px}.opts,.themes{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap"><div class="card">
+
+<div id="home">
+  <h1>Ուղղագրական խաղ</h1>
+  <p class="sub">Յուրաքանչյուր հարցում ընտրիր ճիշտ գրված բառը։ Ընտրիր թեման՝</p>
+  <div class="themes">
+    <button class="theme" data-t="0"><b>Ղ – Խ</b><span>63 բառ</span></button>
+    <button class="theme" data-t="1"><b>Ր – Ռ</b><span>65 բառ</span></button>
+  </div>
+</div>
+
+<div id="quiz" class="hide">
+  <div class="top"><span id="tname"></span><span id="cnt"></span></div>
+  <div class="bar"><i id="pb"></i></div>
+  <p class="q">Ո՞ր տարբերակն է ճիշտ գրված։</p>
+  <span class="clue hide" id="clue"></span>
+  <div class="opts" id="opts"></div>
+  <div class="fb hide" id="fb"></div>
+  <div class="row">
+    <button class="ghost" id="skip">Բաց թողնել</button>
+    <button class="btn hide" id="next">Հաջորդ հարց →</button>
+  </div>
+</div>
+
+<div id="end" class="hide res">
+  <h2 id="verdict"></h2>
+  <div class="score" id="sc"></div>
+  <p class="sub" id="pc"></p>
+  <div class="missed hide" id="missed"></div>
+  <button class="btn" id="again">Խաղալ նորից</button>
+</div>
+
+</div></div>
+
+<script>
+var P1={"\u0572":"\u056d","\u056d":"\u0572","\u0542":"\u053d","\u053d":"\u0542"};
+var P2={"\u0580":"\u057c","\u057c":"\u0580","\u0550":"\u054c","\u054c":"\u0550"};
+var T=[
+{n:"Ղ – Խ",m:P1,w:"դժխեմ,հախճապակի,խախտել,զմրուխտ,աղանդեր,սաղմ,խեղաթյուրել,աղցան,մեղկ,ուղտափուշ,փողկապ,մաղթանք,Աղթամար|կղզի,տաղտուկ,վխտալ,կխտար,շողք,դժոխք,Ախթամար|լեգենդ,դրախտ,եղծել,նողկալի,ճոխություն,ախտ|հիվանդություն,ապուխտ,բախտ,թուխս,ժխտել,խրախճանք,Որմիզդուխտ,ուխտագնաց,ուղտապան,Ջավախք,սխտոր,Սանդուխտ,պանդուխտ,աղբ,խախուտ,մախաղ,հոխորտալ,վախենալ,դաղձ,ողկույզ,Վախթանգ,կմախք,նախկին,տախտակ,աղբյուր,շաղգամ,թուղթ,զեղչ,շաղկապ,նախշ,ուղտաբեռ,պղպեղ,խեղճ,խիղճ,աղտոտ,զեղծել,ցնցուղ,աղյուս,գաղտագողի,բքախեղդ"},
+{n:"Ր – Ռ",m:P2,w:"ապառաժ,վագր,կառք,պառկել,կարգ,եռյակ,քառորդ,թռչել,թրջել,կարծիք,երեսուն,համառոտ,թրթուր,սրթսրթալ,փրփուր,վերնագիր,առնաշաղախ,ինտերնետ,մրմռալ,խրճիթ,կռանալ,կրծել,փրփրել,մատռվակ,փռփռալ,զմռսել,ծեծկռտուք,ջրիմուռ,պայտառ,գզվռտոց,սփյուռքահայ,ճմռթել,ագռավ,զառիվեր,ծռմռել,բարբառ,բառարան,գրգռել,հուրհրալ,մորթել,կռճոն,կոխկռտել,կռթնել,կրճտացնել,կռճիկ,հուռթի,ձերբակալել,ոսկոր,ժխոր,բրոնզ,ճռճռալ,Թաթառ,սաղարթախիտ,տառեխ,Հռիփսիմե,միահամուռ,հռհռալ,կարթ,կրպակ,խուռներամ,խարույկ,կառապան,դռնապան,դրացի,Բորժոմ"}
+];
+var H={"ուխտագնաց":"«ուխտ»՝ խոստում, ուխտագնացություն։","ուղտապան":"«ուղտ»՝ կենդանու անուն։","ուղտափուշ":"«ուղտ»՝ կենդանու անուն։","ուղտաբեռ":"«ուղտ»՝ կենդանու անուն։","խեղճ":"«խեղճ»՝ խղճալի, թշվառ։","խիղճ":"«խիղճ»՝ ներքին բարոյական զգացում։","Սանդուխտ":"«-դուխտ»՝ «դուստր» իմաստով։","Որմիզդուխտ":"«-դուխտ»՝ «դուստր» իմաստով։","փողկապ":"«փող»՝ կոկորդ, պարանոց + կապ։","կառապան":"Արմատը՝ «կառք»։","քառորդ":"«քառ-»՝ չորս։","եռյակ":"«եռ-»՝ երեք։","Հռիփսիմե":"Հատուկ անուն՝ գրվում է «Հռ-»-ով։","դռնապան":"Արմատը՝ «դուռ»։","սփյուռքահայ":"Արմատը՝ «սփյուռք»։","բառարան":"Արմատը՝ «բառ»։","ձերբակալել":"Գրվում է «ձերբ-»։"};
+var $=function(i){return document.getElementById(i)};
+var th,qs,i,score,missed,done;
+
+function build(t){
+  return T[t].w.split(",").map(function(s){
+    var p=s.split("|"),c=p[0],pos=-1,k;
+    for(k=c.length-1;k>=0;k--){if(T[t].m[c[k]]){pos=k;break}}
+    var x=c.slice(0,pos)+T[t].m[c[pos]]+c.slice(pos+1);
+    return {c:c,x:x,clue:p[1]||"",cc:c[pos].toLowerCase(),xc:T[t].m[c[pos]].toLowerCase(),h:H[c]||""};
+  });
+}
+function show(id){["home","quiz","end"].forEach(function(s){$(s).classList.toggle("hide",s!==id)})}
+function start(t){th=t;qs=build(t);i=0;score=0;missed=[];$("tname").textContent="Թեմա՝ "+T[t].n;show("quiz");ask()}
+function ask(){
+  var q=qs[i];done=false;
+  $("cnt").textContent="Հարց "+(i+1)+" / "+qs.length+" · Ճիշտ՝ "+score;
+  $("pb").style.width=(i/qs.length*100)+"%";
+  $("clue").classList.toggle("hide",!q.clue);$("clue").textContent=q.clue?"Նշանակում է՝ "+q.clue:"";
+  var o=[q.c,q.x];if(Math.random()<.5)o.reverse();
+  $("opts").innerHTML="";
+  o.forEach(function(w,n){
+    var b=document.createElement("button");b.className="opt";b.dataset.w=w;
+    b.innerHTML="<small>"+(n+1)+"</small>";b.appendChild(document.createTextNode(w));
+    b.onclick=function(){pick(w)};$("opts").appendChild(b);
+  });
+  $("fb").className="fb hide";$("next").classList.add("hide");$("skip").classList.remove("hide");
+  $("next").textContent=i===qs.length-1?"Տեսնել արդյունքը":"Հաջորդ հարց →";
+}
+function pick(w){
+  if(done)return;done=true;var q=qs[i],ok=w===q.c;
+  document.querySelectorAll(".opt").forEach(function(b){
+    b.disabled=true;
+    if(b.dataset.w===q.c)b.classList.add("ok");
+    else if(b.dataset.w===w)b.classList.add("bad");
+  });
+  var f=$("fb");f.classList.remove("hide");
+  if(ok){score++;f.className="fb ok";f.textContent="Ճիշտ է։ Ապրե՛ս։ "+(q.h||"")}
+  else{missed.push(q.c);f.className="fb bad";
+    f.innerHTML="Սխալ է։ Ճիշտ տարբերակն է՝ <b></b>։ Այս բառում գրվում է «"+q.cc+"», ոչ թե «"+q.xc+"»։ "+(q.h||"Արժե հիշել կամ ստուգել ուղղագրական բառարանում։");
+    f.querySelector("b").textContent="«"+q.c+"»"}
+  $("cnt").textContent="Հարց "+(i+1)+" / "+qs.length+" · Ճիշտ՝ "+score;
+  $("next").classList.remove("hide");$("skip").classList.add("hide");
+}
+function skip(){if(done)return;missed.push(qs[i].c);go()}
+function go(){
+  i++;
+  if(i>=qs.length)finish();else ask();
+}
+function finish(){
+  var p=Math.round(score/qs.length*100);
+  $("sc").textContent=score+" / "+qs.length;
+  $("pc").textContent="Արդյունքը՝ "+p+"%";
+  $("verdict").textContent=p>=90?"Գերազանց արդյունք։":p>=70?"Լավ արդյունք։":p>=50?"Բավարար, կարելի է ավելի լավ։":"Արժե կրկնել թեման։";
+  var m=$("missed");
+  if(missed.length){m.classList.remove("hide");m.innerHTML="<b>Կրկնելու համար՝</b><br>";m.appendChild(document.createTextNode(missed.join(", ")))}
+  else m.classList.add("hide");
+  show("end");
+}
+document.querySelectorAll(".theme").forEach(function(b){b.onclick=function(){start(+b.dataset.t)}});
+$("next").onclick=go;$("skip").onclick=skip;$("again").onclick=function(){show("home")};
+document.addEventListener("keydown",function(e){
+  if($("quiz").classList.contains("hide"))return;
+  if(!done&&(e.key==="1"||e.key==="2")){var b=document.querySelectorAll(".opt")[+e.key-1];if(b)pick(b.dataset.w)}
+  else if(done&&(e.key==="Enter"||e.key==="ArrowRight")){go()}
+});
+</script>
+</body>
+</html>
